@@ -14,21 +14,21 @@ format:
 
 [No abstract is needed.]  Each reproducibility project will have a straightforward, no frills report of the study and reproducibility results. These reports will be publicly available as supplementary material for the aggregate report(s) of the project as a whole.  Also, to maximize project integrity, the intro and methods will be written and critiqued in advance of your attempt to reproduce the results. Introductions can be just 1-2 paragraphs clarifying the main idea of the original study, the target finding for your reproducibility attempt, and any other essential information.  It will NOT have a literature review -- that is in the original publication. You can write both the introduction and the methods in past tense.  
 
-**Clarify key analysis of interest here**  You can also pre-specify additional analyses you plan to do.
+**Clarify key analysis of interest here** 
 
 ### Justification for choice of study
 
-Please describe why you chose to reproduce the results of this study.
+My research is currently focused on individual differences on infant information seeking. I chose to simuluate the data of Poli et al. 2024 with the goal of understanding the analytic pipeline used by the original authors. Through my simulation and analyses, I aim to learn how to (1) process infant gaze data based on their learning from two types of infant looking tasks, (2) leverage an ideal learner model (using stimuli from the visual learning task) to derive information-theoretic measures (e.g., predictability and information gain), and (3) fit a hierachical Bayesian model to estimate latent parameters, or cognitive functions, (e.g., learning performance, sustained attention, curiosity) from infants' looking behavior and the information-theoretic measures. Finally, if time and resources allow, I will use GLMs to relate the z-scored estimates of the latent parameters to simulations of infants' performance on a habituation task. Working through the described pipeline will help me develop the analytic toolkit and understanding needed to plan my own analyses.
 
 ### Anticipated challenges
 
-Do you anticipate running into any challenges when attempting to reproduce these result(s)? If so please, list them here.
+Simulating this data and analytic pipeline involves three stages: input generation, hierarchical modeling, and outcome replication. First, I will need to generate the trial-by-trial stimulus input for the VL task by defining its underlying probabilistic structure and apply information theory to calculate the independent variables (predicability and information gain). Then, I will need to implement the hierachical Bayesian model (HBM) structure by defining hyperparameters for each of the cognitive traits (see Justification section for more details) and use them to generate unique latent parameters for each simulated datapoint. In theory, the individual parameters can then be used to generate and govern trial-by-trial behavioral data (i.e., saccadic latency, looking time, look-aways). This may be particularly challenging as it involves using a complex survival function and controls that I still don't entirely comprehend. Finally, if I choose to replicate the GLMs, I will need to generate dependent habituation outcomes and confirm that the inferred latent parameters match the main finding (e.g., processing speed predicts habituation time). 
 
 ### Links
 
-Project repository (on Github): 
+Project repository (on Github): https://github.com/thenness-y/poli2020
 
-Original paper (as hosted in your repo): 
+Original paper (as hosted in your repo): https://github.com/thenness-y/poli2020/blob/main/original_paper/poli2020scienceadvances.pdf 
 
 ## Methods
 
