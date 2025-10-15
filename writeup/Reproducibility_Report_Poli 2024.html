@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Victoria Hennessy (vhennessy@ucsd.edu)">
-<meta name="dcterms.date" content="2025-10-02">
+<meta name="dcterms.date" content="2025-10-15">
 
 <title>Reproducibility Report for Poli et al.&nbsp;(2024, Developmental Science)</title>
 <style>
@@ -36,7 +36,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="Reproducibility_Report_Poli 2024_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="Reproducibility_Report_Poli 2024_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="Reproducibility_Report_Poli 2024_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Reproducibility_Report_Poli 2024_files/libs/bootstrap/bootstrap-1e118674f8eeaf0dc11d6faf9a2d8791.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="Reproducibility_Report_Poli 2024_files/libs/bootstrap/bootstrap-d6a003b94517c951b2d65075d42fb01b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -100,7 +100,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">October 2, 2025</p>
+      <p class="date">October 15, 2025</p>
     </div>
   </div>
   
@@ -115,20 +115,36 @@ ul.task-list li input[type="checkbox"] {
 <!-- Reproducibility reports should all use this template to standardize reporting across projects. These reports will be public supplementary materials that accompany the summary report(s) of the aggregate results. -->
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>[No abstract is needed.] Each reproducibility project will have a straightforward, no frills report of the study and reproducibility results. These reports will be publicly available as supplementary material for the aggregate report(s) of the project as a whole. Also, to maximize project integrity, the intro and methods will be written and critiqued in advance of your attempt to reproduce the results. Introductions can be just 1-2 paragraphs clarifying the main idea of the original study, the target finding for your reproducibility attempt, and any other essential information. It will NOT have a literature review – that is in the original publication. You can write both the introduction and the methods in past tense.</p>
-<p><strong>Clarify key analysis of interest here</strong></p>
+<p><em>[No abstract is needed.] Each reproducibility project will have a straightforward, no frills report of the study and reproducibility results. These reports will be publicly available as supplementary material for the aggregate report(s) of the project as a whole. Also, to maximize project integrity, the intro and methods will be written and critiqued in advance of your attempt to reproduce the results. Introductions can be just 1-2 paragraphs clarifying the main idea of the original study, the target finding for your reproducibility attempt, and any other essential information. It will NOT have a literature review – that is in the original publication. You can write both the introduction and the methods in past tense.</em></p>
+<p><strong>Clarify key analysis of interest here:</strong></p>
 <section id="justification-for-choice-of-study" class="level3">
 <h3 class="anchored" data-anchor-id="justification-for-choice-of-study">Justification for choice of study</h3>
-<p>My current line of research is focused on individual differences in early information seeking. To study infant learning strategies, Poli and colleagues (2020) have developed an analytic pipeline that integrates an infant-friendly visual learning (VL) task with an ideal learner model from which information-theoretic measures (e.g., predictability and information gain) can be derived for each trial an infant sees. These measures are then incorporated into a hierarchical Bayesian model fitted to infants’ looking behavior (e.g.&nbsp;looking time, saccadic latency) in the VL task. Modeling the relationship between the trial-by-trial quantifications of predictability and information gain and infant performance allows Poli et al.&nbsp;(2024) to obtain estimates of individual differences in cognitive factors captured by the model, including processing speed, learning progress, and curiosity. Working through the described pipeline will help me develop the analytic toolkit and computational understanding needed for my own research program.</p>
+<p>My current line of research focuses on individual differences in early information seeking. To study infant learning strategies, Poli and colleagues (2020; 2024) have developed an analytic pipeline that leverages an infant-friendly visual learning (VL) task from which information-theoretic measures (e.g., <strong>predictability and information gain</strong>) can be derived for each trial in sequences of visual events.</p>
+<p>These measures are then incorporated into a hierarchical Bayesian model fitted to real infants’ looking behavior (look-aways, looking time, and saccadic latency) in the VL task to infer the values of latent parameters that represent specific cognitive functions: <strong>processing speed</strong>, <strong>learning performance</strong>, <strong>curiosity</strong>, and <strong>sustained attention</strong> (see Figure 1).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://doi.org/10.1111/desc.13460"><img src="images/poli2024researchpipeline-01.jpg" class="img-fluid figure-img"></a></p>
+<figcaption>Figure 1. The research pipeline in Poli et al.&nbsp;2024 (Figure 2 in the original paper). The current project will focus on the first three boxes outlined in yellow: (1) reproducing the information-theoretic measures from the stimuli in the visual learning task, (2) simulating infant eye-tracking data during the VL task, and (3) estimating the latent parameters at the individual level.</figcaption>
+</figure>
+</div>
+<p>For the proposed project, I have three primary aims:</p>
+<p><strong>(1)</strong> Derive the information-theoretic measures, predictability and information gain, from the stimuli in the visual learning task.</p>
+<p><strong>(2)</strong> Simulate pre-processed infant looking behavior (not trial-by-trial gaze data) in the visual learning task, specifically saccadic latency and looking time.</p>
+<p><strong>(3)</strong> Fit a hierarchical Bayesian model at the individual level to estimate my latent parameter of interest: learning performance.</p>
+<p><strong>(4)</strong> Compare the analysis on the simulated data to the original data (Poli et al., 2024).</p>
+<p>Working through the described pipeline will help me develop the analytic toolkit and computational understanding needed for my own research program.</p>
 </section>
 <section id="anticipated-challenges" class="level3">
 <h3 class="anchored" data-anchor-id="anticipated-challenges">Anticipated challenges</h3>
-<p>Simulating this data and analytic pipeline involves three stages: input generation, hierarchical modeling, and outcome replication. First, trial-by-trial stimulus input for the VL task will need to be generated by defining its underlying probabilistic structure and applying information theory to calculate the independent variables (predicability and information gain). Then, I will need to implement the hierachical Bayesian model by defining hyperparameters for each of the cognitive traits and use them to generate unique latent parameters for each simulated datapoint. In theory, the individual parameters can then be used to generate and govern trial-by-trial behavioral data (i.e., saccadic latency, looking time, look-aways). This part may be challenging as it involves using complex survival function(s). Finally, if I choose to replicate the GLMs used to compare the latent parameters to infants’ performance in a habituation task, I will need to generate dependent habituation outcomes and confirm that the inferred latent parameters match the main finding (e.g., that infants’ processing speed predicts habituation time).</p>
+<p>Simulating this data and analytic pipeline involves three high-level stages: input generation, hierarchical modeling, and outcome replication, each of which will pose their own computational challenges.</p>
+<p>Thanks to the generosity of the original authors, the code to generate the sequences for the visual learning task is publicly available. I will follow Poli et al.&nbsp;(2020 and 2024) to attempt to derive the information-theoretic measures for each trial in the visual learning task. This may be complex and time-consuming to undertake from scratch given the scope of the current project. In the event that Step 1 hinders the completion of the subsequent step, I will reference the original analysis script, found <a href="https://data.ru.nl/collections/di/dcc/DSC_2019.00056_127">here</a>, or reach out to the original authors for code clarification.</p>
+<p>To estimate individual differences in learning performance, the authors related infants’ saccadic latencies (SL) to how predictable each visual event in a sequence was, and whether this relationship differed across infants. They derived how predictable the sequence was at any given trial in the visual learning task by taking the negative entropy of the probability that the target shape would appear in a certain location. They then fit a Bayesian hierarchical regression model linking infants’ saccadic latencies to sequence predictability (entropy) and used individual infants’ slope estimates as a proxy for learning performance.</p>
 </section>
 <section id="links" class="level3">
 <h3 class="anchored" data-anchor-id="links">Links</h3>
 <p><a href="https://github.com/thenness-y/poli2024">Project Repository</a></p>
 <p><a href="https://github.com/thenness-y/poli2024/blob/main/original_paper/Poli2023DevSci.pdf">Original Paper</a></p>
+<p><a href="https://osf.io/zux9v/overview">Original Data Repository</a></p>
 </section>
 </section>
 <section id="methods" class="level2">
