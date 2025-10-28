@@ -14,7 +14,7 @@ format:
 
 *\[No abstract is needed.\] Each reproducibility project will have a straightforward, no frills report of the study and reproducibility results. These reports will be publicly available as supplementary material for the aggregate report(s) of the project as a whole. Also, to maximize project integrity, the intro and methods will be written and critiqued in advance of your attempt to reproduce the results. Introductions can be just 1-2 paragraphs clarifying the main idea of the original study, the target finding for your reproducibility attempt, and any other essential information. It will NOT have a literature review -- that is in the original publication. You can write both the introduction and the methods in past tense.*
 
-**Clarify key analysis of interest here:**
+**Clarify key analysis of interest here: Hierarchical Bayesian Modeling**
 
 ### Justification for choice of study
 
@@ -26,23 +26,21 @@ These measures are then incorporated into a hierarchical Bayesian model fitted t
 
 For the proposed project, I have three primary aims:
 
-**(1)** Derive the information-theoretic measures, predictability and information gain, from the stimuli in the visual learning task.
+**(1)** Reproduce the findings using the original data and code.
 
-**(2)** Simulate pre-processed infant looking behavior (not trial-by-trial gaze data) in the visual learning task, specifically saccadic latency and looking time.
+**(2)** Simulate infant looking behavior in the visual learning task, e.g., looking time in each trial.
 
-**(3)** Fit a hierarchical Bayesian model at the individual level to estimate my latent parameter of interest: learning performance.
+**(3)** Fit a hierarchical Bayesian model to estimate latent parameter(s) of interest using the simulated data, e.g., learning performance (saccadic latency x predictability) and/or curiosity (stimulus informativity x looking time).
 
-**(4)** Compare the analysis on the simulated data to the original data (Poli et al., 2024).
+**(4)** Compare model fit and analyses from simulated data to the original data (Poli et al., 2024).
 
-Working through the described pipeline will help me develop the analytic toolkit and computational understanding needed for my own research program.
+***Working through the described pipeline will help me develop the analytic toolkit and computational understanding needed for my own research program.***
 
 ### Anticipated challenges
 
 Simulating this data and analytic pipeline involves three high-level stages: input generation, hierarchical modeling, and outcome replication, each of which will pose their own computational challenges.
 
-Thanks to the generosity of the original authors, the code to generate the sequences for the visual learning task is publicly available. I will follow Poli et al. (2020 and 2024) to attempt to derive the information-theoretic measures for each trial in the visual learning task. This may be complex and time-consuming to undertake from scratch given the scope of the current project. In the event that Step 1 hinders the completion of the subsequent step, I will reference the original analysis script, found [here](https://data.ru.nl/collections/di/dcc/DSC_2019.00056_127), or reach out to the original authors for code clarification.
-
-To estimate individual differences in learning performance, the authors related infants' saccadic latencies (SL) to how predictable each visual event in a sequence was, and whether this relationship differed across infants. They derived how predictable the sequence was at any given trial in the visual learning task by taking the negative entropy of the probability that the target shape would appear in a certain location. They then fit a Bayesian hierarchical regression model linking infants' saccadic latencies to sequence predictability (entropy) and used individual infants' slope estimates as a proxy for learning performance.
+The code to generate the sequences for the visual learning task is publicly available. I will follow Poli et al. (2020 and 2024) to attempt to derive the information-theoretic measures for each trial in the visual learning task. This may be complex and time-consuming to undertake from scratch given the scope of the current project. In the event that this step hinders the completion of the subsequent step, I will reference the original analysis script, found [here](https://data.ru.nl/collections/di/dcc/DSC_2019.00056_127), and/or simulate just a portion of the looking behavior (e.g., looking time) to simplify the process.
 
 ### Links
 
@@ -54,13 +52,110 @@ To estimate individual differences in learning performance, the authors related 
 
 ## Methods
 
-### Description of the steps required to reproduce the results
+### **Reproduction:** 
 
-Please describe all the steps necessary to reproduce the key result(s) of this study.
+#### Data Preparation
+
+1.  Load the raw data for the visual learning task.
+    -   Combine the two datasets, `Roris_nostd.csv` and `Roris_smiley.csv`.
+2.  Convert to model-friendly format.
+    -   Create indices and convert to Theano.
+3.  Z-score the dependent variables (looking time and saccadic latency)
+4.  Z-score the independent variables (information gain, predictability, and surprise)
+5.  Handle missing values.
+
+Verify the following columns are present:
+
+-   `subj`: subject ID
+-   `nseq`: sequence number
+-   `ntrialseq`: trial number within sequence
+-   `dwell`: looking time to sequence
+-   `slat`: saccadic latency
+-   `event`: look-away (binary, either 0 or 1)
+-   **`D`: KL divergence or *information gain*** (pre-computed)
+-   **`H`: entropy or *predictability*** (pre-computed)
+-   `I`: ***surprise*** (pre-computed)
+
+#### Analysis Pipeline
+
+1.  [ ] **Fit the hierarchical Bayesian model (HBM)**
+
+    -   Specify relationships of interest (i.e., between looking behavior and latent parameters).
+    -   Fit the model using MCMC sampling:
+        -   Sampling details:
+            -   500k iterations x 2 chains, toss first 490k
+            -   10k kept, 20k total samples per parameter per infant
+        -   Initialization = ADVI + mass matrix adaptation
+    -   Estimate:
+        -   **Processing Speed**: β₀\^SL (intercept for saccadic latency)
+        -   **Learning Performance**: β₁\^SL (correlation between saccadic latency and predictability)
+        -   **Curiosity**: β₁\^LT (correlation between looking time and information gain)
+        -   **Sustained Attention**: λ (from survival function for look-away, controlling for surprise, information gain, and time)
+
+2.  [ ] **Model validation**
+
+    -   Check convergence.
+
+        R\^ threshold should be \< 1.004.
+
+    -   Compare model fit between hierarchical vs. simple (group-only) model
+
+        *Necessary to confirm the model is working correctly. If we don't find that infants look longer at more informative stimuli on average (group infant), model fitting may be wrong. Group-level results should match original findings before proceeding. Must verify that the hierarchical model fits better to prove that individual differences exist.*
+
+        *Authors compared models using WAIC and LOO. Full model (includes individual differences) should have lower scores, indicating a* *better fit. Here's the code chunk where they did this:*
+
+        ``` Python
+        model_waic1 = az.loo(idata, var_name="LT_like")
+        model_waic2 = az.waic(idata, var_name="LT_like")
+        ```
+
+3.  [ ] **Extract individual differences**
+
+    -   Once model has ran, compute median of posterior distributions for each parameter.
+
+        *The HBM produces a probability distribution for each parameter for each infant (e.g., infant X's "learning performance" isn't a single number, but a distribution of plausible values within a CI with 89% confidence). The model represents this as 20,000 samples from the distribution.*
+
+        *The authors computed the median of each infant's distribution t[o get a single value per infant per parameter:]{.underline}*
+
+    ``` Python
+    posterior=pd.DataFrame()
+    posterior["subjnum"]= markasgood.values.reshape(-1, )
+    posterior["LT0"]=np.median(trace["LT0"], axis=0)  # Processing speed (looking time)
+    posterior["LT1"]=np.median(trace["LT1"], axis=0)  # Curiosity
+    posterior["SL0"]=np.median(trace["SL0"], axis=0)  # Processing speed (saccadic)
+    posterior["SL1"]=np.median(trace["SL1"], axis=0)  # Learning performance
+    posterior["lambda0"]=np.median(trace["lambda0"], axis=0)  # Sustained attention
+    posterior["beta_LA"]=np.median(trace["beta_LA"], axis=0)  # (not used in main analysis)
+    posterior.to_csv('posterior_median.csv')
+    ```
+
+    -   Save to an output file in which there is one row per infant; columns = latent parameters.
+
+    -   Identify infants with significant individual effects (89% credible intervals excludes zero)
+
+        *In the original paper, the authors identified 57 infants (40%) with a significant coefficient for learning performance; 31 infants (22%) showed significant curiosity effects.*
+
+### Simulation:
+
+\*Indicates steps that may require assistance from the instructional team.
+
+1.  Define the individual sequence and trial structure using `sequences_t.csv`, available [here](https://osf.io/a93qr/files), which contains the target locations.
+
+2.  \*Use the formulas from the supplementary materials to compute the information-theoretic variables for each sequence (or request this code from Poli and colleagues).
+
+3.  \*Generate individual parameters for 106 infants (e.g., baseline looking time, processing speed, etc) .
+
+4.  \*Generate behavioral data for each infant (e.g., looking time, saccadic latency, etc).
+
+5.  Preprocess using same steps as Reproduction.
+
+6.  Test model recovery:
+
+    **Specifically, I aim to recover similar posterior distributions for at least one of the latent parameters (e.g., curiosity) and achieve a comparable model fit with the simulated data.**
 
 ### Differences from original study
 
-Explicitly describe known differences in the analysis pipeline between the original paper and yours (e.g., computing environment). The goal, of course, is to minimize those differences, but differences may occur. Also, note whether such differences are anticipated to influence your ability to reproduce the original results.
+The computing environments are the same. Visualizations may be carried out in R, but the model and any pre-processing steps will be in Python.
 
 ## Project Progress Check 1
 
